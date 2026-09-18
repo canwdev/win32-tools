@@ -1,0 +1,18 @@
+/* res.rc — 资源脚本
+ *
+ * 坑：图标绝对不能用 "101 3 app.ico" 这种数字类型写法。
+ *   3 = RT_ICON 是"单张位图"，而 .ico 文件里装的是 RT_GROUP_ICON 目录 + 若干张
+ *   RT_ICON 位图。写成数字 3 等于把整个 .ico 当一张原始位图塞进去，
+ *   资源目录里只会出现 TYPE 3 / name 101，**没有 TYPE 14**。
+ *   于是 LoadImageW(..., IMAGE_ICON, ...) 找不到组图标返回 NULL，
+ *   wc.hIcon = NULL，Windows 就画默认图标；ExtractIconEx 也返回 0。
+ *   必须用 ICON 关键字，让 windres 自己去拆 .ico。
+ *
+ * 用数字类型的两个（24 / 10）是原始字节资源，没有结构，数字写法正确。
+ *   24 = RT_MANIFEST
+ *   10 = RT_RCDATA
+ */
+
+101 ICON "app.ico"         /* 应用图标 + 托盘图标（已裁掉 256x256，17KB） */
+102 10   "hvintegrate.exe" /* 内嵌的 Hyper-V 对话框小工具，运行时释放到程序目录 */
+1   24   "app.manifest"    /* comctl32 v6 + asInvoker */
